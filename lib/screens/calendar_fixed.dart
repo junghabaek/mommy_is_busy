@@ -1,108 +1,16 @@
 import 'dart:collection';
-import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:mommy_is_busy/screens/bottom_button_icons.dart';
+import 'package:get/get.dart';
+import 'package:mommy_is_busy/models/calendar_event.dart';
 
-import '../bottom_buttons.dart';
-import 'package:table_calendar/table_calendar.dart';
-
-import '../models/calendar_event.dart';
-import 'package:interval_time_picker/interval_time_picker.dart';
-
-class Calendar extends StatefulWidget {
-  const Calendar({super.key});
+class Calendar_Fixed extends StatelessWidget {
+  const Calendar_Fixed({super.key});
 
 
-  @override
-  State<Calendar> createState() => _CalendarState();
-}
-
-class _CalendarState extends State<Calendar> {
-  late final ValueNotifier<List<Event>> _selectedEvents;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  // List<Event> events = Event.fromJsonToList
-  bool isTimePicked = false;
-  TimeOfDay _pickedTime = const TimeOfDay(hour: 8, minute: 0);
-  final _formKey = GlobalKey<FormState>();
-  // List<Widget> newTasks = [];
-  Map<DateTime, List<Event>> tempMap = {};
-
-  List<Event> tempEventList = [];
-
-
-  // List<Widget> newTasks = [TextFormField(
-  //   onSaved:(val){
-  //     tempEventList.add(Event(eventName: val!));
-  //     .length;
-    // },
-    // decoration: InputDecoration(hintText: '할 일을 적어주세요'),)];
-
-  LinkedHashMap<DateTime, List<Event>> kEvents = LinkedHashMap<DateTime, List<Event>>();
-
-  // LinkedHashMap<DateTime, List<Event>> kEvents; = LinkedHashMap<DateTime, List<Event>>;
-
-  // var kEvents = LinkedHashMap<DateTime, List<Event>>(
-  // equals: isSameDay,
-  // hashCode: getHashCode,
-// );
-
-//
-
-  List<Event> _getEventsForDay(DateTime day){
-    return kEvents[day] ?? [];
-  }
-
-  void _addEventOnFocused(DateTime day, Event event){
-    setState(() {
-      kEvents.addAll({day : [event]});
-    });
-  }
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _selectedEvents.dispose();
-    super.dispose();
-  }
-
-
-
-
-
-  ////////////////////////below is the build method/////////////////////
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-
-
-    List<Widget> newTasks = [TextFormField(
-      key: UniqueKey(),
-      onSaved:(val){
-        tempEventList.add(Event(eventName: val!));
-        // .length;
-      },
-      decoration: InputDecoration(hintText: '할 일을 적어주세요'),)];
-
-    DateTime convertToDateTime(TimeOfDay timeOfDay, DateTime focusedDay){
-
-      return DateTime.utc(focusedDay.year, focusedDay.month, focusedDay.day, timeOfDay.hour, timeOfDay.minute);
-
-    }
 
     Future<Event?> createAlertDialog(BuildContext context) async{
       Event event = await showDialog(
@@ -213,40 +121,33 @@ class _CalendarState extends State<Calendar> {
           }
       );
 
-      if (event !=null){
-        return event;
-      }else{
-        return null;
-      }
-
-    }
 
     return Scaffold(
       backgroundColor: Colors.orange,
       floatingActionButton:
-          Padding(padding: EdgeInsets.only(bottom: 100), child: FloatingActionButton(onPressed: (){
-            // setState(() {
-            //
-            // });
-            createAlertDialog(context).then((onValue){
-              if(onValue?.eventName!='할 일을 다시 지정해 주세요'){
-                Event? tempEvent = onValue;
-                print(onValue);
-                print('dsfjlksfjlsafjdklfjkfjalfas');
-                // _addEventOnFocused(_focusedDay,tempEvent!);
-              }
+      Padding(padding: EdgeInsets.only(bottom: 100), child: FloatingActionButton(onPressed: (){
+        // setState(() {
+        //
+        // });
+        createAlertDialog(context).then((onValue){
+          if(onValue?.eventName!='할 일을 다시 지정해 주세요'){
+            Event? tempEvent = onValue;
+            print(onValue);
+            print('dsfjlksfjlsafjdklfjkfjalfas');
+            // _addEventOnFocused(_focusedDay,tempEvent!);
+          }
 
-              return null;
-            });
-          }, backgroundColor: Colors.orangeAccent, child: const Icon(Icons.add),)),
-      
+          return null;
+        });
+      }, backgroundColor: Colors.orangeAccent, child: const Icon(Icons.add),)),
+
       body:
-          Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Padding(
           padding: EdgeInsets.only(top: 60, right: 12, left: 12),
           child: TableCalendar(
             headerStyle:
-                HeaderStyle(formatButtonVisible: false, titleCentered: true),
+            HeaderStyle(formatButtonVisible: false, titleCentered: true),
             rowHeight: height * .05,
             firstDay: DateTime.utc(2010, 10, 16),
             lastDay: DateTime.utc(2030, 3, 14),
@@ -292,6 +193,6 @@ class _CalendarState extends State<Calendar> {
           )
         ]),
       ]),
-    );
+    );;
   }
 }

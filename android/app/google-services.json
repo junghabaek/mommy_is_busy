@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "312731275413",
+    "project_id": "mommy-is-busy",
+    "storage_bucket": "mommy-is-busy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:312731275413:android:8e634c9fcbbe98ede3cb9c",
+        "android_client_info": {
+          "package_name": "com.example.mommy_is_busy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "312731275413-aq2kci59attdhvovcl81tt2u39itrgq4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9apz2xinESQ5MkmQpuL--iY2VAHHVqI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "312731275413-aq2kci59attdhvovcl81tt2u39itrgq4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

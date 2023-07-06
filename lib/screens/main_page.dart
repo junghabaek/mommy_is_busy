@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mommy_is_busy/bottom_buttons.dart';
+import 'package:mommy_is_busy/screens/bottom_button_icons.dart';
 import 'package:timer_builder/timer_builder.dart';
 
 class MainPage extends StatefulWidget {
@@ -137,20 +138,20 @@ class _MainPageState extends State<MainPage> {
                 ),
               ),
               Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.home)),
-                    BottomButtons(button_name: 'calendar', context: context).returnIconButton(),
-                    IconButton(onPressed: () {}, icon: Icon(Icons.food_bank)),
-                    IconButton(
-                        onPressed: () {}, icon: Icon(Icons.calendar_month)),
-                    IconButton(
-                        onPressed: () {}, icon: Icon(Icons.calendar_month)),
-                    IconButton(
-                        onPressed: () {}, icon: Icon(Icons.calendar_month)),
-                  ],
-                ), //버튼들
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     IconButton(onPressed: () {}, icon: Icon(Icons.home)),
+                //     BottomButtons(button_name: 'calendar', context: context).returnIconButton(),
+                //     IconButton(onPressed: () {}, icon: Icon(Icons.food_bank)),
+                //     IconButton(
+                //         onPressed: () {}, icon: Icon(Icons.calendar_month)),
+                //     IconButton(
+                //         onPressed: () {}, icon: Icon(Icons.calendar_month)),
+                //     BottomButtons(button_name: 'settings', context: context).returnIconButton(),
+                //   ],
+                // ), //버튼들
+                BottomButtonIconRow(),
                 Container(
                   color: Colors.black,
                   height: height * .05,

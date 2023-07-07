@@ -46,6 +46,19 @@ class Calendar_Fixed extends StatelessWidget {
 
     }
 
+    DateTime deadlineDateTime (TimeOfDay pickedTime, DateTime dateTime){
+
+      final year = dateTime.year;
+      final month = dateTime.month;
+      final day = dateTime.day;
+      final hour = pickedTime.hour;
+      final minutes = pickedTime.minute;
+
+      return DateTime.utc(year, month, day, hour, minutes);
+
+    }
+
+
     List<Widget> newTasks = [TextFormField(
       key: UniqueKey(),
       onSaved:(val){
@@ -53,7 +66,8 @@ class Calendar_Fixed extends StatelessWidget {
           Fluttertoast.showToast(msg: '할 일을 입력해 주세요');
         }else {
           calendarController.tempEventList.add(Event(
-              eventName: val!, deadline: calendarController.pickedTime.value));
+              eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
+          createdAt: DateTime.now()));
         }
       },
       decoration: InputDecoration(hintText: '할 일을 적어주세요'),)];
@@ -128,7 +142,8 @@ class Calendar_Fixed extends StatelessWidget {
                         setState(() {
                           newTasks.add(TextFormField(
                             onSaved: (val) {
-                              calendarController.tempEventList.add(Event(eventName: val!, deadline: calendarController.pickedTime.value));
+                              calendarController.tempEventList.add(Event(eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
+                              createdAt: DateTime.now()));
                             },
                             decoration: const InputDecoration(
                                 hintText: '할 일을 적어주세요'),));

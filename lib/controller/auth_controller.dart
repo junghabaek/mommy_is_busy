@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mommy_is_busy/controller/firestore_controller.dart';
+import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 
 import '../screens/login_signup/login.dart';
@@ -25,7 +26,7 @@ class AuthController extends GetxController{
     if (user == null){
       Get.offAll(()=>LogInPage());
     }else{
-      Get.offAll(()=>MainPage());
+      Get.offAll(()=>Home());
     }
   }
 

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:mommy_is_busy/screens/calendar.dart';
 import 'package:mommy_is_busy/screens/calendar_fixed.dart';
 import 'package:mommy_is_busy/screens/fridge_state.dart';
-import 'package:mommy_is_busy/screens/main_page.dart';
+import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/settings.dart';
 
 import 'household_account.dart';
@@ -17,7 +17,7 @@ class BottomButtonIconRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(onPressed: () {
-          Get.offAll(()=>MainPage());
+          Get.offAll(()=>Home());
         }, icon: Icon(Icons.home)),
         IconButton(onPressed: (){
           Get.offAll(()=>Calendar_Fixed());

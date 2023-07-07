@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mommy_is_busy/screens/calendar_fixed.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 import 'package:mommy_is_busy/screens/calendar.dart';
 import 'package:get/get.dart';
@@ -27,7 +28,7 @@ class BottomButtons{
         // }
         // )
         // );
-        Get.offAll(Calendar());
+        Get.offAll(Calendar_Fixed());
       }, icon: const Icon(Icons.calendar_month));
     }else if(button_name == 'settings'){
       return IconButton(onPressed: (){

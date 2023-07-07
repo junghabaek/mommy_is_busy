@@ -93,7 +93,7 @@ class _CalendarState extends State<Calendar> {
     List<Widget> newTasks = [TextFormField(
       key: UniqueKey(),
       onSaved:(val){
-        tempEventList.add(Event(eventName: val!));
+        tempEventList.add(Event(eventName: val!, deadline: _pickedTime));
         // .length;
       },
       decoration: InputDecoration(hintText: '할 일을 적어주세요'),)];
@@ -137,7 +137,7 @@ class _CalendarState extends State<Calendar> {
                               Row(children: [
                                 Text('언제까지 해야 하나요? : '),
                                 ElevatedButton(onPressed: () {
-                                  showTimePicker(context: context, initialTime: _pickedTime);
+                                  // showTimePicker(context: context, initialTime: _pickedTime);
                                   showIntervalTimePicker(
                                       context: context,
                                       interval: 15,
@@ -159,7 +159,7 @@ class _CalendarState extends State<Calendar> {
                       ElevatedButton(onPressed: (){
                         setState((){
                           newTasks.add(TextFormField(
-                            onSaved:(val){tempEventList.add(Event(eventName: val!));},
+                            onSaved:(val){tempEventList.add(Event(eventName: val!, deadline: _pickedTime));},
                             decoration: const InputDecoration(hintText: '할 일을 적어주세요'),));
                           print('setstate');
                         });

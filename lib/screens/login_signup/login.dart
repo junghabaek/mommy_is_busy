@@ -14,7 +14,7 @@ class LogInPage extends StatelessWidget {
 
   late String email;
   late String password;
-  late String nickName;
+  late String nickname;
 
   void setEmail(String val){
     email = val;
@@ -24,8 +24,8 @@ class LogInPage extends StatelessWidget {
     password = val;
   }
 
-  void setNickName(String val){
-    nickName=val;
+  void setNickname(String val){
+    nickname=val;
   }
 
   @override
@@ -89,7 +89,7 @@ class LogInPage extends StatelessWidget {
                           child :
                               AuthController.controller.isLoginPressed.value?
                               LoginSelected(setEmail: setEmail, setPassword: setPassword,) :
-                                  SignupSelected(setEmail: setEmail, setNickName: setNickName, setPassword: setPassword,)
+                                  SignupSelected(setEmail: setEmail, setNickName: setNickname, setPassword: setPassword,)
 
                         ),
 
@@ -99,11 +99,11 @@ class LogInPage extends StatelessWidget {
 
                 ),
 
-          ElevatedButton(onPressed: (){
+          ElevatedButton(onPressed: () {
             if (AuthController.controller.isLoginPressed.value){
               AuthController.controller.login(email, password);
             }else{
-              AuthController.controller.signup(email, password);
+              AuthController.controller.signup(email, password, nickname);
             }
           }, child: Icon(Icons.arrow_forward)),
 

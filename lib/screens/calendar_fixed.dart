@@ -1,62 +1,122 @@
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:mommy_is_busy/controller/auth_controller.dart';
+import 'package:mommy_is_busy/controller/calendar_controller.dart';
+import 'package:mommy_is_busy/controller/firestore_controller.dart';
 import 'package:mommy_is_busy/models/calendar_event.dart';
+import 'package:interval_time_picker/interval_time_picker.dart';
+import 'package:table_calendar/table_calendar.dart';
+
+import 'bottom_button_icons.dart';
+
 
 class Calendar_Fixed extends StatelessWidget {
-  const Calendar_Fixed({super.key});
+  Calendar_Fixed({super.key});
 
+  final calendarController = Get.put(CalendarController());
 
 
   @override
   Widget build(BuildContext context) {
 
-    Future<Event?> createAlertDialog(BuildContext context) async{
-      Event event = await showDialog(
+    LinkedHashMap<DateTime, List<Event>> kEvents = LinkedHashMap<DateTime, List<Event>>();
+
+    List<Event> getEventsForDay(DateTime day){
+      return kEvents[day] ?? [];
+    }
+
+    late final ValueNotifier<List<Event>> selectedEvents;
+
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    CalendarFormat calendarFormat = CalendarFormat.month;
+
+    // DateTime selectedDay = calendarController.focusedDay.value;
+    selectedEvents = ValueNotifier(getEventsForDay(calendarController.selectedDay.value!));
+
+
+
+    DateTime convertToDateTime(TimeOfDay timeOfDay, DateTime focusedDay){
+
+      return DateTime.utc(focusedDay.year, focusedDay.month, focusedDay.day, timeOfDay.hour, timeOfDay.minute);
+
+    }
+
+    List<Widget> newTasks = [TextFormField(
+      key: UniqueKey(),
+      onSaved:(val){
+        if (val=='') {
+          Fluttertoast.showToast(msg: '할 일을 입력해 주세요');
+        }else {
+          calendarController.tempEventList.add(Event(
+              eventName: val!, deadline: calendarController.pickedTime.value));
+        }
+      },
+      decoration: InputDecoration(hintText: '할 일을 적어주세요'),)];
+
+    Future<void> createAlertDialog(BuildContext context) async {
+      await showDialog(
           context: context,
-          builder: (context){
+          builder: (context) {
             return StatefulBuilder(
-                builder: (context, setState){
-                  LinkedHashMap<DateTime, List<Event>> kEvents = LinkedHashMap<DateTime, List<Event>>();
+                builder: (context, setState) {
+                  LinkedHashMap<DateTime, List<Event>> kEvents = LinkedHashMap<
+                      DateTime,
+                      List<Event>>();
 
                   return AlertDialog(
                     title: Text('할 일을 입력하세요'),
                     content: Form(
-                      key: _formKey,
+                      key: calendarController.formKey.value,
                       child: Container(
-                        height: MediaQuery.of(context).size.height*.3,
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .height * .3,
                         child: Column(
                           children: [
                             Expanded(
                               child: Container(
-                                width: MediaQuery.of(context).size.width*.5,
-                                child: ListView.builder(itemCount: newTasks.length, itemBuilder: (context, index){
-                                  return newTasks[index];
-                                }),
+                                width: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width * .5,
+                                child: ListView.builder(
+                                    itemCount: newTasks.length,
+                                    itemBuilder: (context, index) {
+                                      return newTasks[index];
+                                    }),
                               ),
                             ),
                             // TextFormField(decoration: InputDecoration(hintText: '할 일을 적어주세요'),),
                             SizedBox(height: 20,),
-                            if(isTimePicked)
-                              Text('${_pickedTime.format(context)} 까지'),
+                            if(calendarController.isTimePicked.value)
+                              Text('${calendarController.pickedTime.value.format(context)} 까지'),
 
-                            if(!isTimePicked)
+                            if(!calendarController.isTimePicked.value)
                               Row(children: [
                                 Text('언제까지 해야 하나요? : '),
                                 ElevatedButton(onPressed: () {
-                                  showTimePicker(context: context, initialTime: _pickedTime);
+                                  // showTimePicker(context: context,
+                                  //     initialTime: calendarController.pickedTime.value);
                                   showIntervalTimePicker(
                                       context: context,
                                       interval: 15,
-                                      initialTime: _pickedTime).then((value) {
-                                    setState(() {
-                                      isTimePicked=true;
-                                      _pickedTime = value!;
-                                    }
-                                    );
+                                      initialTime: calendarController.pickedTime.value).then((value) {
+                                        setState((){
+
+                                          calendarController.isTimePicked.value = true;
+                                          calendarController.pickedTime.value = value!;
+                                        });
+
                                   }
-                                  );}, child: Icon(Icons.timelapse)),]
+                                  );
+                                }, child: Icon(Icons.timelapse)),
+                              ]
                               )
 
                           ],
@@ -64,43 +124,60 @@ class Calendar_Fixed extends StatelessWidget {
                       ),
                     ),
                     actions: [
-                      ElevatedButton(onPressed: (){
-                        setState((){
+                      ElevatedButton(onPressed: () {
+                        setState(() {
                           newTasks.add(TextFormField(
-                            onSaved:(val){tempEventList.add(Event(eventName: val!));},
-                            decoration: const InputDecoration(hintText: '할 일을 적어주세요'),));
+                            onSaved: (val) {
+                              calendarController.tempEventList.add(Event(eventName: val!, deadline: calendarController.pickedTime.value));
+                            },
+                            decoration: const InputDecoration(
+                                hintText: '할 일을 적어주세요'),));
                           print('setstate');
                         });
-
                       },
                         child: Text('할 일 추가'),),
-                      SizedBox(width: MediaQuery.of(context).size.width*0.3,),
+                      SizedBox(width: MediaQuery
+                          .of(context)
+                          .size
+                          .width * 0.3,),
                       ElevatedButton(
                         child: Text(' 확인 '),
-                        onPressed: () {
+                        onPressed: () async {
                           // kEvents.addAll();
                           // _selectedEvents.
                           // newTask를 넣어줘야함...
                           // 주체도 적어줘야함
                           //
-                          _formKey.currentState!.save();
-                          DateTime convertedTime=convertToDateTime(_pickedTime, _focusedDay);
-                          kEvents.addAll({convertedTime : tempEventList});
+
+
+
+                          calendarController.formKey.value.currentState!.save();
+                          DateTime convertedTime = convertToDateTime(
+                              calendarController.pickedTime.value, calendarController.focusedDay.value);
+                          calendarController.removeRepeatedEvents(); // 중복값 잘 없앴음.
+                          kEvents.addAll({convertedTime: calendarController.tempEventList.value});
 
 
                           print('=============================');
 
-                          for (Event e in kEvents[convertToDateTime(_pickedTime, _focusedDay)]!){
+                          print(convertedTime);
+
+                          for (Event e in kEvents[convertedTime]!) {
                             print(e.eventName);
+
+                            FirestoreController.controller.storeTasks(e, convertedTime);
                           }
 
                           print('=============================');
-                          tempEventList.clear();
+                          calendarController.tempEventList.clear();
 
                           kEvents.clear();
 
+                          calendarController.isTimePicked.value=false;
+
                           Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('성공적으로 업데이트됐습니다.')));
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('성공적으로 업데이트됐습니다.')));
 
                           // setState((){
                           //   kEvents.clear();
@@ -115,84 +192,75 @@ class Calendar_Fixed extends StatelessWidget {
                         },
                       )
                     ],
-                  );}
+                  );
+                }
             );
-
           }
       );
 
 
-    return Scaffold(
-      backgroundColor: Colors.orange,
-      floatingActionButton:
-      Padding(padding: EdgeInsets.only(bottom: 100), child: FloatingActionButton(onPressed: (){
-        // setState(() {
-        //
-        // });
-        createAlertDialog(context).then((onValue){
-          if(onValue?.eventName!='할 일을 다시 지정해 주세요'){
-            Event? tempEvent = onValue;
-            print(onValue);
-            print('dsfjlksfjlsafjdklfjkfjalfas');
-            // _addEventOnFocused(_focusedDay,tempEvent!);
-          }
 
-          return null;
-        });
-      }, backgroundColor: Colors.orangeAccent, child: const Icon(Icons.add),)),
+    }
 
-      body:
-      Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Padding(
-          padding: EdgeInsets.only(top: 60, right: 12, left: 12),
-          child: TableCalendar(
-            headerStyle:
-            HeaderStyle(formatButtonVisible: false, titleCentered: true),
-            rowHeight: height * .05,
-            firstDay: DateTime.utc(2010, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) {
-              // Use `selectedDayPredicate` to determine which day is currently selected.
-              // If this returns true, then `day` will be marked as selected.
 
-              // Using `isSameDay` is recommended to disregard
-              // the time-part of compared DateTime objects.
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              if (!isSameDay(_selectedDay, selectedDay)) {
-                // Call `setState()` when updating the selected day
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
+    return Obx(
+      ()=> Scaffold(
+        backgroundColor: Colors.orange,
+        floatingActionButton:
+        Padding(padding: EdgeInsets.only(bottom: 100), child: FloatingActionButton(onPressed: (){
 
-              }
-            },
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                // Call `setState()` when updating calendar format
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              // No need to call `setState()` here
-              _focusedDay = focusedDay;
-            },
+          createAlertDialog(context);
+
+        }, backgroundColor: Colors.orangeAccent, child: const Icon(Icons.add),)),
+
+        body:
+        Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Padding(
+            padding: EdgeInsets.only(top: 60, right: 12, left: 12),
+            child: TableCalendar(
+              headerStyle:
+              HeaderStyle(formatButtonVisible: false, titleCentered: true),
+              rowHeight: height * .05,
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2030, 3, 14),
+              focusedDay: calendarController.focusedDay.value,
+              calendarFormat: calendarFormat,
+              selectedDayPredicate: (day) {
+                // Use `selectedDayPredicate` to determine which day is currently selected.
+                // If this returns true, then `day` will be marked as selected.
+
+                // Using `isSameDay` is recommended to disregard
+                // the time-part of compared DateTime objects.
+                return isSameDay(calendarController.selectedDay.value, day);
+              },
+              onDaySelected: (selectedDay, focusedDay) {
+                if (!isSameDay(calendarController.selectedDay.value, selectedDay)) {
+                    calendarController.selectedDay.value = selectedDay;
+                    calendarController.focusedDay.value = focusedDay;
+
+                }
+              },
+              onFormatChanged: (format) {
+                if (calendarFormat != format) {
+                  // Call `setState()` when updating calendar format
+                    calendarFormat = format;
+                }
+              },
+              onPageChanged: (focusedDay) {
+                // No need to call `setState()` here
+                calendarController.focusedDay.value = focusedDay;
+              },
+            ),
           ),
-        ),
-        Column(children: [
-          BottomButtonIconRow(),
-          Container(
-            color: Colors.black,
-            height: height * .05,
-          )
+          Column(children: [
+            BottomButtonIconRow(),
+            Container(
+              color: Colors.black,
+              height: height * .05,
+            )
+          ]),
         ]),
-      ]),
+      ),
     );;
   }
 }

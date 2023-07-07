@@ -1,13 +1,29 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Event{
+
   bool isDone = false;
   String eventName = '할 일을 다시 지정해 주세요';
-  // DateTime? deadline = null;
+  //created date 필요하고
+  DateTime createdAt = DateTime.now();
+  TimeOfDay deadline; //몇년 몇월 몇일 몇시까지?
 
-  Event({required this.eventName, }){}
+  Event({required this.eventName, required this.deadline}){}
+
+  @override
+  bool operator ==(other) {
+    if (identical(this, other)) return true;
+    return other is Event &&
+        other.eventName == eventName &&
+        other.deadline == deadline;
+  }
+
+  @override
+  int get hashCode => eventName.hashCode ^ deadline.hashCode;
+
 }
 
 // var kEvents = LinkedHashMap<DateTime, List<Event>>(

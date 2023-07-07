@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mommy_is_busy/screens/calendar.dart';
+import 'package:mommy_is_busy/screens/calendar_fixed.dart';
 import 'package:mommy_is_busy/screens/fridge_state.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 import 'package:mommy_is_busy/screens/settings.dart';
@@ -16,21 +17,21 @@ class BottomButtonIconRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(onPressed: () {
-          Get.offAll(MainPage());
+          Get.offAll(()=>MainPage());
         }, icon: Icon(Icons.home)),
         IconButton(onPressed: (){
-          Get.offAll(Calendar());
+          Get.offAll(()=>Calendar_Fixed());
         }, icon: Icon(Icons.calendar_month)),
         IconButton(onPressed: () {
-          Get.offAll(Fridge());
+          Get.offAll(()=>Fridge());
         }, icon: Icon(Icons.food_bank)),
         IconButton(
             onPressed: () {
-              Get.offAll(HouseAccount());
+              Get.offAll(()=>HouseAccount());
             }, icon: Icon(Icons.monetization_on)),
         IconButton(
             onPressed: () {
-              Get.offAll(Settings());
+              Get.offAll(()=>Settings());
             }, icon: Icon(Icons.settings)),
         
       ],

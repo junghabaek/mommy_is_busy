@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mommy_is_busy/controller/firestore_controller.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 
 import '../screens/login_signup/login.dart';
@@ -32,8 +33,12 @@ class AuthController extends GetxController{
     await authentication.signInWithEmailAndPassword(email: email, password: password);
   }
 
-  void signup(String email, String password) async {
+  void signup(String email, String password, String nickname) async {
     await authentication.createUserWithEmailAndPassword(email: email, password: password);
+    await FirestoreController.controller.firestore.collection('user').doc(authentication.currentUser!.uid).set({
+      'nickname' : nickname,
+      'email_address' : email,
+    });
   }
 
   void signout() async {

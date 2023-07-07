@@ -22,13 +22,17 @@ class Home extends StatelessWidget {
     }
 
     FirestoreController.controller.eventList.clear();
+    FirestoreController.controller.eventMap.clear();
+
+    FirestoreController.controller.getEvents(DateTime.now());
+    // List<DateTime> keyList = FirestoreController.controller.eventMap.value.keys.toList()..sort();
+
+    print('keylist');
+    // print(keyList);
+    // keyList.forEach((element) {print(element.toString());});
 
     print('db call');
-    FirestoreController.controller.getEvents(DateTime.now());
 
-    Future.delayed(Duration(seconds: 5));
-
-    var tempEventList = FirestoreController.controller.eventList.value;
 
     return Scaffold(
         backgroundColor: Colors.orange,
@@ -126,18 +130,21 @@ class Home extends StatelessWidget {
                         height: height * .55,
                         color: Colors.yellow,
                         child: Obx( ()=>ListView.builder(
-                            itemCount: FirestoreController.controller.eventList.length,
+                            itemCount: FirestoreController.controller.eventMap.length,
                             padding: EdgeInsets.all(8),
                             itemBuilder: (context, idx) {
-                              return Obx(()=>Container(
+                              DateTime mapKey = FirestoreController.controller.keyList[idx];
+
+                              return Container(
                                 color: Colors.grey,
-                                padding: EdgeInsets.all(8),
+                                margin: EdgeInsets.all(8),
                                 child: Column(
                                   children:[
-                                  Text(FirestoreController.controller.eventList.value[idx].eventName),
-                                  Text(FirestoreController.controller.eventList.value[idx].isDone.toString())
+                                    Text(mapKey.toString())
+                                  // Text(FirestoreController.controller.eventList.value[idx].eventName),
+                                  // Text(FirestoreController.controller.eventList.value[idx].isDone.toString())
                                 ])
-                              ));
+                              );
                               // return Container(
                               //     child: Text(''),
                               //     margin: EdgeInsets.all(8),

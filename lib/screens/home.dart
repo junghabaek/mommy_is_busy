@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mommy_is_busy/controller/firestore_controller.dart';
+import 'package:mommy_is_busy/screens/task_list_screen.dart';
 import 'package:timer_builder/timer_builder.dart';
+import 'package:mommy_is_busy/models/calendar_event.dart';
 
 import 'bottom_button_icons.dart';
 
@@ -25,7 +27,7 @@ class Home extends StatelessWidget {
     FirestoreController.controller.eventMap.clear();
 
     FirestoreController.controller.getEvents(DateTime.now());
-    // List<DateTime> keyList = FirestoreController.controller.eventMap.value.keys.toList()..sort();
+    List<DateTime> keyList = FirestoreController.controller.eventMap.value.keys.toList()..sort();
 
     print('keylist');
     // print(keyList);
@@ -135,15 +137,20 @@ class Home extends StatelessWidget {
                             itemBuilder: (context, idx) {
                               DateTime mapKey = FirestoreController.controller.keyList[idx];
 
-                              return Container(
-                                color: Colors.grey,
-                                margin: EdgeInsets.all(8),
-                                child: Column(
-                                  children:[
-                                    Text(mapKey.toString())
-                                  // Text(FirestoreController.controller.eventList.value[idx].eventName),
-                                  // Text(FirestoreController.controller.eventList.value[idx].isDone.toString())
-                                ])
+                              return GestureDetector(
+                                onTap: (){
+                                  Get.offAll(()=>TaskListScreen(mapKey: mapKey,));
+                                },
+                                child: Container(
+                                  color: Colors.grey,
+                                  margin: EdgeInsets.all(8),
+                                  child: Column(
+                                    children:[
+                                      Text(mapKey.toString())
+                                    // Text(FirestoreController.controller.eventList.value[idx].eventName),
+                                    // Text(FirestoreController.controller.eventList.value[idx].isDone.toString())
+                                  ])
+                                ),
                               );
                               // return Container(
                               //     child: Text(''),
@@ -156,13 +163,7 @@ class Home extends StatelessWidget {
                   ),
                 ),
               ),
-              Column(children: [
-                BottomButtonIconRow(),
-                Container(
-                  color: Colors.black,
-                  height: height * .05,
-                ) // 광고
-              ])
+              BottomButtonIconRow()
             ]));
   }
 }

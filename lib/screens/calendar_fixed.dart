@@ -267,13 +267,7 @@ class Calendar_Fixed extends StatelessWidget {
               },
             ),
           ),
-          Column(children: [
-            BottomButtonIconRow(),
-            Container(
-              color: Colors.black,
-              height: height * .05,
-            )
-          ]),
+          BottomButtonIconRow(),
         ]),
       ),
     );;

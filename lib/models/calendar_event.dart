@@ -6,13 +6,14 @@ import 'package:table_calendar/table_calendar.dart';
 
 class Event{
 
+  int id = 0;
   bool isDone = false;
   String eventName = '할 일을 다시 지정해 주세요';
   //created date 필요하고
   DateTime createdAt;
   DateTime deadline; //몇년 몇월 몇일 몇시까지?
 
-  Event({required this.eventName, required this.deadline, this.isDone=false, required this.createdAt}){}
+  Event({this.id=0, required this.eventName, required this.deadline, this.isDone=false, required this.createdAt}){}
   // Event({required this.createdAt, required this.isDone, required this.eventName, required this.deadline}){}
 
   @override
@@ -24,7 +25,7 @@ class Event{
   }
 
   @override
-  int get hashCode => eventName.hashCode ^ deadline.hashCode;
+  int get hashCode => eventName.hashCode ^ createdAt.hashCode;
 
   // Event fromFirestore (DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options){
   //   final data = snapshot.data();
@@ -39,6 +40,7 @@ class Event{
   factory Event.fromFirestore( DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? options){
     final data = snapshot.data();
     return Event(
+      id: data?['id'],
       eventName: data?['task_name'],
       deadline: data?['deadline'].toDate(), // timestamp -> dateTime
       isDone: data?['isDone'],
@@ -48,6 +50,7 @@ class Event{
 
   Map<String, dynamic> toFirestore(){
     return {
+      'id' : id,
       'task_name' : eventName,
       'deadline' : deadline,
       'isDone' : isDone,

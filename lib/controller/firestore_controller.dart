@@ -13,8 +13,9 @@ class FirestoreController extends GetxController{
 
   void storeTasks(Event event, DateTime dateTime) async {
     await firestore.collection('user').doc(AuthController.controller.authentication.currentUser!.uid).collection('task')
-        .doc(event.createdAt.toString()).set(
+        .doc(event.hashCode.toString()).set(
       {
+        'id' : event.hashCode,
         'createdAt' : event.createdAt,
         'task_name' : event.eventName,
         'deadline' : dateTime,
@@ -38,17 +39,25 @@ class FirestoreController extends GetxController{
     await convertedCollection.where('createdAt', isLessThan: dateTime).get().then((QuerySnapshot querySnapshot){ querySnapshot.docs.forEach((e) {
       Event event = e.data() as Event;
       DateTime deadline = event.deadline;
+
       if(eventMap.containsKey(deadline)){
         eventMap[deadline]!.add(event);
       }else{
         eventMap[deadline] = <Event>[];
         eventMap[deadline]!.add(event);
       }
-    });});
+    });
+    });
+
+    //중복 제거하기
+    eventMap.forEach((key, value) {
+      eventMap[key] = eventMap[key]!.toSet().toList();
+    });
 
     eventMap.forEach((key, value) {
       value.forEach((element) {print('$key : ${element.eventName}');});
     });
+
 
     var temp = eventMap.keys.toList()..sort();
     keyList = temp.obs;
@@ -57,6 +66,32 @@ class FirestoreController extends GetxController{
 
 
 
+
     // print(query);
   }
+
+
+  void updateTaskDone(int hashcode) async {
+    await firestore.collection('user').doc(
+        AuthController.controller.authentication.currentUser!.uid).collection(
+        'task')
+        .doc(hashcode.toString()).update(
+        {
+          'isDone': true,
+        }
+    );
+  }
+
+  void undoUpdateTaskDone (int hashcode) async {
+    await firestore.collection('user').doc(
+        AuthController.controller.authentication.currentUser!.uid).collection(
+        'task')
+        .doc(hashcode.toString()).update(
+        {
+          'isDone': false,
+        }
+    );
+  }
+
+
 }

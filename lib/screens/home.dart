@@ -163,7 +163,7 @@ class Home extends StatelessWidget {
                   ),
                 ),
               ),
-              BottomButtonIconRow()
+              BottomButtonIconRow(pageFrom: 'Home',)
             ]));
   }
 }

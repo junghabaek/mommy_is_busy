@@ -62,7 +62,7 @@ class Calendar_Fixed extends StatelessWidget {
     List<Widget> newTasks = [TextFormField(
       key: UniqueKey(),
       onSaved:(val){
-        if (val=='') {
+        if (val?.trim()=='') {
           Fluttertoast.showToast(msg: '할 일을 입력해 주세요');
         }else {
           calendarController.tempEventList.add(Event(
@@ -141,10 +141,10 @@ class Calendar_Fixed extends StatelessWidget {
                       ElevatedButton(onPressed: () {
                         setState(() {
                           newTasks.add(TextFormField(
-                            onSaved: (val) {
-                              calendarController.tempEventList.add(Event(eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
-                              createdAt: DateTime.now()));
-                            },
+                            // onSaved: (val) {
+                            //   calendarController.tempEventList.add(Event(eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
+                            //   createdAt: DateTime.now()));
+                            // },
                             decoration: const InputDecoration(
                                 hintText: '할 일을 적어주세요'),));
                           print('setstate');
@@ -184,15 +184,17 @@ class Calendar_Fixed extends StatelessWidget {
                           }
 
                           print('=============================');
-                          calendarController.tempEventList.clear();
 
                           kEvents.clear();
 
                           calendarController.isTimePicked.value=false;
 
                           Navigator.of(context).pop();
+
+                          if(!calendarController.tempEventList.isEmpty)
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text('성공적으로 업데이트됐습니다.')));
+                          calendarController.tempEventList.clear();
 
                           // setState((){
                           //   kEvents.clear();
@@ -267,7 +269,7 @@ class Calendar_Fixed extends StatelessWidget {
               },
             ),
           ),
-          BottomButtonIconRow(),
+          BottomButtonIconRow(pageFrom: 'Calendar',),
         ]),
       ),
     );;

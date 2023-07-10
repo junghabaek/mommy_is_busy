@@ -9,8 +9,9 @@ import 'package:mommy_is_busy/screens/settings.dart';
 import 'household_account.dart';
 
 class BottomButtonIconRow extends StatelessWidget {
-  const BottomButtonIconRow({super.key});
+  BottomButtonIconRow({super.key, required this.pageFrom});
 
+  String pageFrom;
 
   @override
   Widget build(BuildContext context) {
@@ -21,20 +22,25 @@ class BottomButtonIconRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(onPressed: () {
+            if(pageFrom!='Home')
             Get.offAll(()=>Home());
           }, icon: Icon(Icons.home)),
           IconButton(onPressed: (){
+            if(pageFrom!='Calendar')
             Get.offAll(()=>Calendar_Fixed());
           }, icon: Icon(Icons.calendar_month)),
           IconButton(onPressed: () {
+            if(pageFrom!='Fridge')
             Get.offAll(()=>Fridge());
           }, icon: Icon(Icons.food_bank)),
           IconButton(
               onPressed: () {
+                if(pageFrom!='HouseAccount')
                 Get.offAll(()=>HouseAccount());
               }, icon: Icon(Icons.monetization_on)),
           IconButton(
               onPressed: () {
+                if(pageFrom!='Settings')
                 Get.offAll(()=>Settings());
               }, icon: Icon(Icons.settings)),
 

@@ -9,16 +9,17 @@ import 'package:mommy_is_busy/controller/calendar_controller.dart';
 import 'package:mommy_is_busy/controller/firestore_controller.dart';
 import 'package:mommy_is_busy/models/calendar_event.dart';
 import 'package:interval_time_picker/interval_time_picker.dart';
+import 'package:mommy_is_busy/static_methods/time_converters.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'bottom_button_icons.dart';
+import 'package:timezone/standalone.dart' as tz;
 
 
 class Calendar_Fixed extends StatelessWidget {
   Calendar_Fixed({super.key});
 
   final calendarController = Get.put(CalendarController());
-
 
   @override
   Widget build(BuildContext context) {
@@ -40,23 +41,8 @@ class Calendar_Fixed extends StatelessWidget {
 
 
 
-    DateTime convertToDateTime(TimeOfDay timeOfDay, DateTime focusedDay){
 
-      return DateTime.utc(focusedDay.year, focusedDay.month, focusedDay.day, timeOfDay.hour, timeOfDay.minute);
 
-    }
-
-    DateTime deadlineDateTime (TimeOfDay pickedTime, DateTime dateTime){
-
-      final year = dateTime.year;
-      final month = dateTime.month;
-      final day = dateTime.day;
-      final hour = pickedTime.hour;
-      final minutes = pickedTime.minute;
-
-      return DateTime.utc(year, month, day, hour, minutes);
-
-    }
 
 
     List<Widget> newTasks = [TextFormField(
@@ -66,7 +52,7 @@ class Calendar_Fixed extends StatelessWidget {
           Fluttertoast.showToast(msg: '할 일을 입력해 주세요');
         }else {
           calendarController.tempEventList.add(Event(
-              eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
+              eventName: val!, deadline: ((TC.subtractNineHours(TC.convertToSeoulTimeZone(TC.deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value))))),
           createdAt: DateTime.now()));
         }
       },
@@ -167,20 +153,23 @@ class Calendar_Fixed extends StatelessWidget {
 
 
                           calendarController.formKey.value.currentState!.save();
-                          DateTime convertedTime = convertToDateTime(
+                          DateTime convertedTime = TC.convertToDateTime(
                               calendarController.pickedTime.value, calendarController.focusedDay.value);
+                          convertedTime = TC.convertToSeoulTimeZone(convertedTime);
                           calendarController.removeRepeatedEvents(); // 중복값 잘 없앴음.
                           kEvents.addAll({convertedTime: calendarController.tempEventList.value});
 
 
                           print('=============================');
 
-                          print(convertedTime);
 
                           for (Event e in kEvents[convertedTime]!) {
                             print(e.eventName);
+                            print(e.deadline);
+                            print(e.createdAt);
 
-                            FirestoreController.controller.storeTasks(e, convertedTime);
+                            // FirestoreController.controller.storeTasks(e, convertedTime);
+                            FirestoreController.controller.storeTasks(e);
                           }
 
                           print('=============================');

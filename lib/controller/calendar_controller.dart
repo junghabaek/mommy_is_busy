@@ -13,7 +13,13 @@ class CalendarController extends GetxController{
   var focusedDay = DateTime.now().obs;
   var selectedDay = DateTime.now().obs;
 
+  var focusedDayFromHome = DateTime.now().obs;
+  var selectedDayFromHome = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).obs;
+
   void removeRepeatedEvents (){
     tempEventList = tempEventList.value.toSet().toList().obs;
   }
 }
+
+// I/flutter ( 5698): 2023-07-10 15:00:00.000Z
+// I/flutter ( 5698): 2023-07-11 15:00:00.000Z

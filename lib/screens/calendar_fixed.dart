@@ -228,7 +228,7 @@ class Calendar_Fixed extends StatelessWidget {
               HeaderStyle(formatButtonVisible: false, titleCentered: true),
               rowHeight: height * .05,
               firstDay: DateTime.utc(2010, 10, 16),
-              lastDay: DateTime.utc(2030, 3, 14),
+              lastDay: DateTime.utc(2040, 3, 14),
               focusedDay: calendarController.focusedDay.value,
               calendarFormat: calendarFormat,
               selectedDayPredicate: (day) {

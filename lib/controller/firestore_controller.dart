@@ -26,7 +26,7 @@ class FirestoreController extends GetxController{
     );
   }
 
-  void getEvents(DateTime dateTime) async{
+  Future<void> getEvents(DateTime dateTime) async{
 
     // DateTime from = (dateTime.add(Duration(hours: 9)));
     // DateTime to = from.add(Duration(days: 1));
@@ -41,14 +41,16 @@ class FirestoreController extends GetxController{
     DateTime from = dateTime;
     DateTime to = from.add(Duration(days: 1));
 
+    // UTC 표현법때문에 고생했다.
+    // 2023-07-25 08:00:00.000 이런식으로 마지막에 Z가 없으면 로컬타임이고
+    // 2023-07-25 08:00:00.000Z 이런식으로 Z가 붙어있으면 UTC이다,
+    // 즉 위 두개의 시간은 서로 다른 시간이다.
+    // 로컬 타임을 UTC로 변환하려면 시차를 더하거나 빼준다음에 Z를 붙인다.
+    // 애초에 문제가 생겼던 이유는 DatePicker는 UTC를 반환하고
+    // DateTime.now() 는 로컬타임을 반환한다.
+    // firebase에는 로컬타임으로 변환되어서 올라간다. 로컬타임을 업데이트 하면 그대로 올라가고, utc를 올리면 로컬로 변환된 시간이 올라간다.
+    // 결론은 어떤 값을 시스템에서 받아오거나 어떤 프로그램을 통해 받아온다면 그 값이 utc인지 로컬타임인지 확인하는게 꼭 중요하다.
 
-    //utc +9 에 맞게끔 변환해줘야함.이게 웃긴게 저장할때는 맘대로 utc타임으로 변환해서 저장하면서 (이것까진 이해됨)
-    //조건절로 받아올 때는 utc타임으로 변환안해줘서 내가 변환해서 받아와야함
-    // 어쨌건 저장할때는 정확한 시간으로 저장되기때문에, 받아올 때 변환을 해주는게 맞다고 본다.
-
-    print(from);
-    print(to);
-    print('to');
 
     // QuerySnapshot query = await firestore.collection('user').doc(AuthController.controller.authentication.currentUser!.uid).collection('task').where('createdAt', isLessThan: dateTime).get();
     // await firestore.collection('user').doc(AuthController.controller.authentication.currentUser!.uid).collection('task').where('createdAt', isLessThan: dateTime).get().
@@ -82,13 +84,14 @@ class FirestoreController extends GetxController{
     });
 
     eventMap.forEach((key, value) {
-      value.forEach((element) {print('$key : ${element.eventName}');});
+      value.forEach((element) {print('============$key : ${element.eventName}');});
     });
 
 
     var temp = eventMap.keys.toList()..sort();
     keyList = temp.obs;
 
+    print('123123123123123');
     print(keyList);
 
 

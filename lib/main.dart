@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mommy_is_busy/controller/auth_controller.dart';
 import 'package:mommy_is_busy/controller/calendar_controller.dart';
 import 'package:mommy_is_busy/controller/firestore_controller.dart';
+import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/login_signup/login.dart';
 // import 'package:intl/date_symbol_data_http_request.dart';
 import 'package:mommy_is_busy/screens/the_very_first_page.dart';
@@ -32,14 +33,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue
       ),
-      // localizationsDelegates: [
-      //   GlobalMaterialLocalizations.delegate,
-      //   GlobalWidgetsLocalizations.delegate,
-      // ],
-      // supportedLocales: [
-      //   Locale('ko', 'KR'),
-      // ],
+
       home: LogInPage(),
+      // getPages: _getPages(),
     );
   }
+
+  // List<GetPage> _getPages(){
+  //   return [
+  //     GetPage(
+  //       name: '/Home',
+  //       page: ()=>const Home(),
+  //       binding: HomeBindings(),
+  //     ),
+  //   ];
+  // }
 }

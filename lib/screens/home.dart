@@ -16,7 +16,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    CalendarController calendarController = Get.put(CalendarController());
+    // CalendarController.controller CalendarController.controller = Get.put(CalendarController.controller());
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     CalendarFormat calendarFormat = CalendarFormat.month;
@@ -34,6 +34,25 @@ class Home extends StatelessWidget {
       return result;
     }
 
+    bool allTaskDone(Map<DateTime, List<Event>> eventMap){
+
+      bool result = true;
+
+      eventMap.forEach((key, value) {
+        if (!isEveryTaskDone(value))
+          result = false;
+      });
+
+      return result;
+    }
+
+    String deadlineMarker(DateTime dateTime){
+      String hour = dateTime.hour.toString();
+      String min = dateTime.minute.toString();
+
+      return '$hour시 $min분까지 해야할 일';
+    }
+
     String howBusy = '매우바쁜';
 
     String getSystemTime() {
@@ -41,19 +60,56 @@ class Home extends StatelessWidget {
       return DateFormat('yMMMMEEEEd').format(now);
     }
 
+
+
     FirestoreController.controller.eventList.clear();
     FirestoreController.controller.eventMap.clear();
 
-    FirestoreController.controller.getEvents(calendarController.selectedDayFromHome.value);
-    print('selectedDayFromHome :${calendarController.selectedDayFromHome.value}');
+    FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
+    print('selectedDayFromHome :${CalendarController.controller.selectedDayFromHome.value}');
     List<DateTime> keyList = FirestoreController.controller.eventMap.value.keys.toList()..sort();
 
+
+    final eventMap = FirestoreController.controller.eventMap.value;
+    // final keyList = FirestoreController.controller.keyList.value;
     print('keylist');
-    print(DateTime.now().toString());
-    // print(keyList);
+    // print(DateTime.now().toString());
+    print(keyList);
     // keyList.forEach((element) {print(element.toString());});
 
     print('db call');
+
+    Widget buildContainer(DateTime mapKey) {
+      return GestureDetector(
+        key: UniqueKey(),
+        onTap: () {
+          Get.offAll(() => TaskListScreen(mapKey: mapKey));
+        },
+        child: Container(
+          color: Colors.grey,
+          margin: EdgeInsets.all(8),
+          child: Column(
+            children: [Text(mapKey.toString())],
+          ),
+        ),
+      );
+    }
+
+    Widget buildCompletedContainer(DateTime mapKey) {
+      return Container(
+        color: Colors.grey,
+        margin: EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Text(
+              mapKey.toString(),
+              style: TextStyle(decoration: TextDecoration.lineThrough),
+            ),
+          ],
+        ),
+      );
+    }
+
 
 
     return Scaffold(
@@ -63,8 +119,8 @@ class Home extends StatelessWidget {
             child: FloatingActionButton(
               onPressed: (){
               showDialog(context: context, builder: (context){
-            return Obx(
-                ()=> AlertDialog(title: Text('날짜를 지정해 주세요'),
+            return
+                 AlertDialog(title: Text('날짜를 지정해 주세요'),
                 actions: [],
                 content: Container(
                   width: width*.8,
@@ -75,8 +131,8 @@ class Home extends StatelessWidget {
                   HeaderStyle(formatButtonVisible: false, titleCentered: true),
                   rowHeight: height * .05,
                   firstDay: DateTime.utc(2010, 10, 16),
-                  lastDay: DateTime.utc(2030, 3, 14),
-                  focusedDay: calendarController.focusedDayFromHome.value,
+                  lastDay: DateTime.utc(2040, 3, 14),
+                  focusedDay: CalendarController.controller.focusedDayFromHome.value,
                   calendarFormat: calendarFormat,
                   selectedDayPredicate: (day) {
                     // Use `selectedDayPredicate` to determine which day is currently selected.
@@ -84,15 +140,17 @@ class Home extends StatelessWidget {
 
                     // Using `isSameDay` is recommended to disregard
                     // the time-part of compared DateTime objects.
-                    return isSameDay(calendarController.selectedDay.value, day);
+                    return isSameDay(CalendarController.controller.selectedDayFromHome.value, day);
                   },
                   onDaySelected: (selectedDay, focusedDay) {
-                      calendarController.selectedDayFromHome.value = TC.subtractNineHours(selectedDay.toLocal());
-                      calendarController.focusedDayFromHome.value = focusedDay;
+                      CalendarController.controller.selectedDayFromHome.value = TC.subtractNineHours(selectedDay.toLocal());
+                      CalendarController.controller.focusedDayFromHome.value = focusedDay;
                       FirestoreController.controller.eventList.clear();
                       FirestoreController.controller.eventMap.clear();
-                      FirestoreController.controller.getEvents(calendarController.selectedDayFromHome.value);
+                      FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
 
+
+                      print(focusedDay);
                       print('selectedDay');
                       print(selectedDay);
                       Navigator.of(context).pop();
@@ -106,11 +164,11 @@ class Home extends StatelessWidget {
                   },
                   onPageChanged: (focusedDay) {
                     // No need to call `setState()` here
-                    calendarController.focusedDayFromHome.value = focusedDay;
+                    CalendarController.controller.focusedDayFromHome.value = focusedDay;
                   },
                 ),
 
-              )),
+              ),
             );
     });},
               backgroundColor: Colors.orangeAccent,
@@ -135,7 +193,7 @@ class Home extends StatelessWidget {
                                     '오늘은 ',
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                  TimerBuilder.periodic(Duration(minutes: 1),
+                                  TimerBuilder.periodic(Duration(seconds: 5),
                                       builder: (context) {
                                         return Text(
                                           getSystemTime(),
@@ -207,50 +265,130 @@ class Home extends StatelessWidget {
                       ),
                       Container(
                       height: 50,
-                        child: Obx(()=> Text('${calendarController.selectedDayFromHome.value.month}월 ${calendarController.selectedDayFromHome.value.day}일의 할 일들은 아래와 같습니다.'),)
+                        child: Obx(()=> Text('${CalendarController.controller.selectedDayFromHome.value.month}월 ${CalendarController.controller.selectedDayFromHome.value.day}일의 할 일들은 아래와 같습니다.'),)
                       ),
                       SizedBox(
                         height: 20,
                       ),
+
                       Expanded(
                         child: Container(
+                          width: width,
                           color: Colors.yellow,
-                          child: Obx( ()=>ListView.builder(
-                              itemCount: FirestoreController.controller.eventMap.length,
-                              padding: EdgeInsets.all(8),
-                              itemBuilder: (context, idx) {
-                                DateTime mapKey = FirestoreController.controller.keyList[idx];
+                          child: Obx( (){
+                            final eventMap = FirestoreController.controller.eventMap;
+                            final keyList = FirestoreController.controller.keyList;
 
-                                return GestureDetector(
-                                  key: UniqueKey(),
-                                  onTap: (){
-                                    Get.offAll(()=>TaskListScreen(mapKey: mapKey,));
-                                  },
-                                  child: Container(
-                                    color: Colors.grey,
-                                    margin: EdgeInsets.all(8),
-                                    child: Column(
-                                      children:[
-                                        (isEveryTaskDone(FirestoreController.controller.eventMap[mapKey]!))?
-                                Text(mapKey.toString(), style: TextStyle( decoration: TextDecoration.lineThrough),) : Text(mapKey.toString())
-                                      // Text(FirestoreController.controller.eventList.value[idx].eventName),
-                                      // Text(FirestoreController.controller.eventList.value[idx].isDone.toString())
-                                    ])
-                                  ),
-                                );
-                                // return Container(
-                                //     child: Text(''),
-                                //     margin: EdgeInsets.all(8),
-                                //     height: 40,
-                                //     color: Colors.amber);
-                              })),),
-                      )
-                      // Container(height: height*0.2, color: Colors.green,)
-                    ],
-                  ),
-                ),
-              ),
+                            if (allTaskDone(eventMap))
+                              return Icon(Icons.coffee, size: 100,);
+
+                            return ListView.builder(
+                                itemCount: eventMap.length,
+                                padding: EdgeInsets.all(8),
+                                itemBuilder: (context, idx) {
+                                  DateTime mapKey = keyList[idx];
+
+                                  if (!isEveryTaskDone(eventMap[mapKey]!)){
+                                    return buildContainer(mapKey);
+                                    GestureDetector(
+                                      key: UniqueKey(),
+                                      onTap: (){
+                                        Get.offAll(()=>TaskListScreen(mapKey: mapKey,));
+                                      },
+                                      child: Container(
+                                          color: Colors.grey,
+                                          margin: EdgeInsets.all(8),
+                                          child: Column(
+                                              children:[
+                                                Text(mapKey.toString())
+                                              ])
+                                      ),
+                                    );}
+                                  return buildCompletedContainer(mapKey);
+                                  Container(
+                                      color: Colors.grey,
+                                      margin: EdgeInsets.all(8),
+                                      child: Column(
+                                          children:[
+                                            Text(mapKey.toString(), style: TextStyle( decoration: TextDecoration.lineThrough))
+                                          ])
+                                  );
+
+                                });
+                          }),),
+                      ),
+
+                    //   Expanded(
+                    //     child: Container(
+                    //       color: Colors.yellow,
+                    //       child: Obx(()=>ListView.builder(
+                    //             itemCount: Fir,
+                    //             padding: EdgeInsets.all(8),
+                    //             itemBuilder: (context, idx) {
+                    //               DateTime mapKey = keyList[idx];
+                    //               // return Container(
+                    //               //   height: 30,
+                    //               //   color: Colors.blue,
+                    //               //   child: Text(mapKey.toString()),
+                    //               // );
+                    //               // return SizedBox();
+                    //
+                    //               if (!isEveryTaskDone(eventMap[mapKey]!)) {
+                    //                 return GestureDetector(
+                    //                   key: UniqueKey(),
+                    //                   onTap: () {
+                    //                     Get.offAll(() => TaskListScreen(mapKey: mapKey));
+                    //                   },
+                    //                   child: Container(
+                    //                     color: Colors.grey,
+                    //                     margin: EdgeInsets.all(8),
+                    //                     child: Column(
+                    //                       children: [
+                    //                         Text(mapKey.toString()),
+                    //                       ],
+                    //                     ),
+                    //                   ),
+                    //                 );
+                    //               } else {
+                    //                 return Container(
+                    //                   color: Colors.grey,
+                    //                   margin: EdgeInsets.all(8),
+                    //                   child: Column(
+                    //                     children: [
+                    //                       Text(
+                    //                         mapKey.toString(),
+                    //                         style: TextStyle(decoration: TextDecoration.lineThrough),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 );
+                    //               }
+                    //             },
+                    //           )
+                    //
+                    //       ),
+                    //     ),
+                    //
+                    //   // Container(height: height*0.2, color: Colors.green,)
+                    // ],
+              //     ),
+              //   ),
+              // ),
+
+
+            ])
+    )
+    ),
               BottomButtonIconRow(pageFrom: 'Home',)
-            ]));
+    ]
+    )
+    );
+  }
+
+}
+
+class HomeBindings implements Bindings {
+  @override
+  void dependencies() {
   }
 }

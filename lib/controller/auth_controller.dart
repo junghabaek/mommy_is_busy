@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mommy_is_busy/controller/firestore_controller.dart';
+import 'package:mommy_is_busy/controller/fridge_controller.dart';
 import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 
@@ -12,7 +13,8 @@ class AuthController extends GetxController{
   late Rx<User?> _user;
   FirebaseAuth authentication = FirebaseAuth.instance;
   RxBool isLoginPressed = true.obs;
-  final formKey = GlobalKey<FormState>().obs;
+  final loginFormKey = UniqueKey().obs;
+  final signupFormKey = UniqueKey().obs;
 
   @override
   void onReady(){
@@ -26,7 +28,9 @@ class AuthController extends GetxController{
     if (user == null){
       Get.offAll(()=>LogInPage());
     }else{
+      FridgeController.controller.initFridge();
       Get.offAll(()=>Home());
+
     }
   }
 
@@ -42,7 +46,7 @@ class AuthController extends GetxController{
     });
   }
 
-  void signout() async {
+  void signOut() async {
     await authentication.signOut();
   }
 

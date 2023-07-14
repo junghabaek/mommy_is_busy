@@ -12,7 +12,9 @@ class Settings extends StatelessWidget {
         child: Column(
           children: [
             TextButton(onPressed: (){
-              AuthController.controller.signout();
+              AuthController.controller.authentication.signOut();
+              print('####################');
+              print(AuthController.controller.authentication.currentUser!.uid);
               FirestoreController.controller.eventList.clear();
             }, child: Text('Sign out', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
 

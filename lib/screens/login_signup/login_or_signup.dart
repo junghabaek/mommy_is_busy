@@ -12,7 +12,7 @@ class LoginSelected extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: AuthController.controller.formKey.value,
+      key: AuthController.controller.loginFormKey.value,
       // key: UniqueKey(),
       child: Column(
           children: [
@@ -85,7 +85,7 @@ class SignupSelected extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: AuthController.controller.formKey.value,
+      key: AuthController.controller.signupFormKey.value,
       child: Column(
           children: [
             TextFormField(

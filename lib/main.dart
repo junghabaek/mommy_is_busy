@@ -22,7 +22,7 @@ void main() async{
     Get.put(FirestoreController());
     Get.put(CalendarController());
     Get.put(FridgeController());
-    FridgeController.controller.initFridge();
+    // FridgeController.controller.initFridge();
   });
   runApp(const MyApp());
 

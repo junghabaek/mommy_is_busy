@@ -127,10 +127,13 @@ class Calendar_Fixed extends StatelessWidget {
                       ElevatedButton(onPressed: () {
                         setState(() {
                           newTasks.add(TextFormField(
-                            // onSaved: (val) {
-                            //   calendarController.tempEventList.add(Event(eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
-                            //   createdAt: DateTime.now()));
-                            // },
+                            onSaved: (val) {
+                              // calendarController.tempEventList.add(Event(eventName: val!, deadline: deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value),
+                              // createdAt: DateTime.now()));
+                              calendarController.tempEventList.add(Event(
+                                  eventName: val!, deadline: ((TC.subtractNineHours(TC.convertToSeoulTimeZone(TC.deadlineDateTime(calendarController.pickedTime.value, calendarController.selectedDay.value))))),
+                                  createdAt: DateTime.now()));
+                            },
                             decoration: const InputDecoration(
                                 hintText: '할 일을 적어주세요'),));
                           print('setstate');

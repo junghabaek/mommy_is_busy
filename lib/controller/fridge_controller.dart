@@ -8,7 +8,7 @@ class FridgeController extends GetxController{
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  final String uid = AuthController.controller.authentication.currentUser!.uid;
+  String? uid;
 
   late RxBool hasMeat;
   late RxBool hasVeggies;
@@ -16,9 +16,19 @@ class FridgeController extends GetxController{
   late RxBool hasSauce;
   late RxBool hasSnacks;
   late RxBool hasDrinks;
+  // late SharedPreferences pref;// 매번 함수를 부를 때 마다 만들고싶진 않은데...
+
+  // final SharedPreferences pref = await SharedPreferences.getInstance();
+
+  var textController = TextEditingController().obs;
+  RxString text = ''.obs;
 
   Future<void> initFridge() async {
     final SharedPreferences pref = await _prefs;
+
+    print('**************');
+    uid = AuthController.controller.authentication.currentUser==null? 'not logged in' : AuthController.controller.authentication.currentUser!.uid;
+    print(uid);
 
     //   //'meat - uid' 가 초기화 되지 않은 경우
     //   if (pref.getBool('meat - $uid') == null){
@@ -57,6 +67,11 @@ class FridgeController extends GetxController{
       pref.setBool('drinks - $uid', false);
     hasDrinks = pref.getBool('drinks - $uid')!.obs;
 
+    if(pref.getString('text - $uid') == null || pref.getString('text - $uid') == '')
+      pref.setString('text - $uid', '메모');
+    text = pref.getString('text - $uid')!.obs;
+    textController.value.text = (text.value);
+
   }
 
   Future<void> toggleFood(RxBool hasFood, String food) async {
@@ -73,6 +88,21 @@ class FridgeController extends GetxController{
     // print(hasMeat.value);
 
 }
+
+
+  Future<void> saveSharedText(String text) async{
+    final SharedPreferences pref = await _prefs;
+
+    pref.setString('text - $uid', text);
+  }
+
+  Future<void> clearSharedText() async{
+    final SharedPreferences pref = await _prefs;
+
+    pref.setString('text - $uid', '');
+  }
+
+
 
 
 

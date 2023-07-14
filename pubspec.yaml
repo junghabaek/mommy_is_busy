@@ -45,6 +45,8 @@ dependencies:
   cloud_firestore: ^4.8.2
   fluttertoast: ^8.2.2
   timezone: any
+  shared_preferences: ^2.2.0
+
 
 
 

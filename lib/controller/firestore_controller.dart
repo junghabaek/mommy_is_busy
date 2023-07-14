@@ -26,6 +26,10 @@ class FirestoreController extends GetxController{
     );
   }
 
+  void initiateFridge() async{
+    await firestore.collection('user').doc(AuthController.controller.authentication.currentUser!.uid).collection('fridge').doc('');
+  }
+
   Future<void> getEvents(DateTime dateTime) async{
 
     // DateTime from = (dateTime.add(Duration(hours: 9)));

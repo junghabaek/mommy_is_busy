@@ -11,6 +11,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+import 'controller/fridge_controller.dart';
+
 void main() async{
   // initializeDateFormatting().then((_) => runApp(const MyApp()));
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,8 @@ void main() async{
     Get.put(AuthController());
     Get.put(FirestoreController());
     Get.put(CalendarController());
+    Get.put(FridgeController());
+    FridgeController.controller.initFridge();
   });
   runApp(const MyApp());
 

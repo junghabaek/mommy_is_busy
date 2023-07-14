@@ -28,6 +28,8 @@ class TaskListScreen extends StatelessWidget {
       return result;
     }
 
+
+
     // if(isEveryTaskDone(FirestoreController.controller.eventMap[mapKey]!)){
     //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Every task is done for this time.')));
     // }
@@ -39,64 +41,86 @@ class TaskListScreen extends StatelessWidget {
         children: [
             Expanded(
               child:
-                ListView.builder(itemCount: FirestoreController.controller.eventMap[mapKey]!.length
-                  , itemBuilder: (context, idx){
-                  final eachTask = FirestoreController.controller.eventMap[mapKey]![idx];
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 60, 12, 0),
+                  child: Container(
+                    color: Colors.blue,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20,),
+                        Text('끝난 일은 옆으로 밀어주세요.'),
+                        Expanded(
+                          child: ListView.builder(itemCount: FirestoreController.controller.eventMap[mapKey]!.length
+                            , itemBuilder: (context, idx){
+                            final eachTask = FirestoreController.controller.eventMap[mapKey]![idx];
 
-                  // print(eachTask.eventName);
-                  // FirestoreController.controller.eventMap[mapKey]!.forEach((element) {print(element.eventName);});
-                    { // 끝마치치 않은 task들만 보여주기 -- return null 하면 안되서 SizedBox()를 대신 리턴함
+                            // print(eachTask.eventName);
+                            // FirestoreController.controller.eventMap[mapKey]!.forEach((element) {print(element.eventName);});
+                              { // 끝마치치 않은 task들만 보여주기 -- return null 하면 안되서 SizedBox()를 대신 리턴함
 
-                      if(eachTask.isDone==false) {
-                        return Dismissible(
-                            key: UniqueKey(),
-                            onDismissed: (direction) {
-                              FirestoreController.controller.updateTaskDone(
-                                  eachTask.id);
-                              FirestoreController.controller.eventMap[mapKey]![idx].isDone=true;
-                              print(eachTask.hashCode);
-                              // 모든 태스크를 완료했다면
-                              if(isEveryTaskDone(FirestoreController.controller.eventMap[mapKey]!)){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Every task is done for this deadline.'),
-                                    action: SnackBarAction(
-                                      label: 'Undo',
-                                        onPressed: (){
-                                        FirestoreController.controller.undoUpdateTaskDone(eachTask.id);
-                                        FirestoreController.controller.eventMap[mapKey]![idx].isDone=false;
-                                        Get.offAll(()=>TaskListScreen(mapKey: mapKey));
-                                        },
-                                    )
-                                    ,));
-                                Get.offAll(()=>Home());
-                              }else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Task Done'),
-                                    action: SnackBarAction(
-                                      label: 'Undo',
-                                      onPressed: (){
-                                        FirestoreController.controller.undoUpdateTaskDone(eachTask.id);
-                                        FirestoreController.controller.eventMap[mapKey]![idx].isDone=false;
-                                        Get.offAll(()=>TaskListScreen(mapKey: mapKey));
+                                if(eachTask.isDone==false) {
+                                  return Dismissible(
+                                      key: UniqueKey(),
+                                      onDismissed: (direction) {
+                                        FirestoreController.controller.updateTaskDone(
+                                            eachTask.id);
+                                        FirestoreController.controller.eventMap[mapKey]![idx].isDone=true;
+                                        print(eachTask.hashCode);
+                                        // 모든 태스크를 완료했다면
+                                        if(isEveryTaskDone(FirestoreController.controller.eventMap[mapKey]!)){
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                  content: Text('Every task is done for this deadline.'),
+                                              action: SnackBarAction(
+                                                label: 'Undo',
+                                                  onPressed: (){
+                                                  FirestoreController.controller.undoUpdateTaskDone(eachTask.id);
+                                                  FirestoreController.controller.eventMap[mapKey]![idx].isDone=false;
+                                                  Get.offAll(()=>TaskListScreen(mapKey: mapKey));
+                                                  },
+                                              )
+                                              ,));
+                                          Get.offAll(()=>Home());
+                                        }else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                  content: Text('Task Done'),
+                                              action: SnackBarAction(
+                                                label: 'Undo',
+                                                onPressed: (){
+                                                  FirestoreController.controller.undoUpdateTaskDone(eachTask.id);
+                                                  FirestoreController.controller.eventMap[mapKey]![idx].isDone=false;
+                                                  Get.offAll(()=>TaskListScreen(mapKey: mapKey));
+                                                },
+                                              ),)
+                                          );
+                                        }
                                       },
-                                    ),)
-                                );
+                                      background: Container(color: Colors.deepOrange,),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            color: Colors.yellow,
+                                            child: ListTile(
+                                              title: Text(FirestoreController.controller
+                                                  .eventMap[mapKey]![idx].eventName),
+                                            ),
+                                          ),
+                                          SizedBox(height: 3,)
+                                        ],
+                                      ));
+                                } else{
+                                  return SizedBox();
+                                }
                               }
-                            },
-                            background: Container(color: Colors.deepOrange,),
-                            child: ListTile(
-                              title: Text(FirestoreController.controller
-                                  .eventMap[mapKey]![idx].eventName),
-                            ));
-                      } else{
-                        return SizedBox();
-                      }
-                    }
-                  }
+                            }
 
         ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
 
           BottomButtonIconRow(pageFrom: 'TaskScreenPage',)

@@ -1,112 +1,124 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mommy_is_busy/controller/auth_controller.dart';
+import 'package:mommy_is_busy/controller/firestore_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FridgeController extends GetxController{
   static FridgeController controller = Get.find();
 
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  String? uid;
+  String connectedId = ' ';
 
   late RxBool hasMeat;
-  late RxBool hasVeggies;
-  late RxBool hasFruits;
-  late RxBool hasSauce;
-  late RxBool hasSnacks;
-  late RxBool hasDrinks;
-  // late SharedPreferences pref;// 매번 함수를 부를 때 마다 만들고싶진 않은데...
-
-  // final SharedPreferences pref = await SharedPreferences.getInstance();
-
+  RxBool hasVeggies = false.obs;
+  RxBool hasFruits = false.obs;
+  RxBool hasSauce = false.obs;
+  RxBool hasSnacks = false.obs;
+  RxBool hasDrinks = false.obs;
   var textController = TextEditingController().obs;
-  RxString text = ''.obs;
+  RxString memo = 'memo'.obs;
 
-  Future<void> initFridge() async {
-    final SharedPreferences pref = await _prefs;
+  Future<void> loadFridge() async {
+    hasMeat = false.obs;
 
-    print('**************');
-    uid = AuthController.controller.authentication.currentUser==null? 'not logged in' : AuthController.controller.authentication.currentUser!.uid;
-    print(uid);
+    DocumentSnapshot snapshot = await FirestoreController.controller.firestore
+        .collection('user').doc(
+        AuthController.controller.authentication.currentUser!.uid).get();
 
-    //   //'meat - uid' 가 초기화 되지 않은 경우
-    //   if (pref.getBool('meat - $uid') == null){
-    //     pref.setBool('meat - $uid', false); // data persists in filesystem
-    //     hasMeat = pref.getBool('meat - $uid')!.obs; // hasMeat is set to a value
-    //   } else { // pref.getBool('meat - $uid) 가 존재하면
-    //     // pref.setBool은 할 필요가 없고
-    //   }
-    //   hasMeat = pref.getBool('meat - $uid')!.obs;
-    //
-    // }
+    connectedId = snapshot.get('connected_id');
 
-    //위의 코드는 이렇게 더 간단하게 고칠 수 있다
+    if (connectedId == ' ') { //if no other account is connected
+      DocumentSnapshot unConnectedFridgeDocumentSnapshot = await FirestoreController
+          .controller.firestore.collection('user').doc(
+          AuthController.controller.authentication.currentUser!.uid).collection('fridge').doc('default_fridge').get();
 
-    if (pref.getBool('meat - $uid') == null)
-      pref.setBool('meat - $uid', false);
-    hasMeat = pref.getBool('meat - $uid')!.obs;
+      bool tempMeat = unConnectedFridgeDocumentSnapshot.get('hasMeat');
+      hasMeat.value = tempMeat;
 
-    if (pref.getBool('veggies - $uid') == null)
-      pref.setBool('veggies - $uid', false);
-    hasVeggies = pref.getBool('veggies - $uid')!.obs;
+      bool tempVeggies = unConnectedFridgeDocumentSnapshot.get('hasVeggies');
+      hasVeggies.value = tempVeggies;
 
-    if (pref.getBool('fruits - $uid') == null)
-      pref.setBool('fruits - $uid', false);
-    hasFruits = pref.getBool('fruits - $uid')!.obs;
+      bool tempFruits = unConnectedFridgeDocumentSnapshot.get('hasFruits');
+      hasFruits.value = tempFruits;
 
-    if (pref.getBool('sauce - $uid') == null)
-      pref.setBool('sauce - $uid', false);
-    hasSauce = pref.getBool('sauce - $uid')!.obs;
+      bool tempSauce = unConnectedFridgeDocumentSnapshot.get('hasSauce');
+      hasSauce.value = tempSauce;
 
-    if (pref.getBool('snacks - $uid') == null)
-      pref.setBool('snacks - $uid', false);
-    hasSnacks = pref.getBool('snacks - $uid')!.obs;
+      bool tempSnacks = unConnectedFridgeDocumentSnapshot.get('hasSnacks');
+      hasSnacks.value = tempSnacks;
 
-    if (pref.getBool('drinks - $uid') == null)
-      pref.setBool('drinks - $uid', false);
-    hasDrinks = pref.getBool('drinks - $uid')!.obs;
+      bool tempDrinks = unConnectedFridgeDocumentSnapshot.get('hasDrinks');
+      hasDrinks.value = tempDrinks;
 
-    if(pref.getString('text - $uid') == null || pref.getString('text - $uid') == '')
-      pref.setString('text - $uid', '메모');
-    text = pref.getString('text - $uid')!.obs;
-    textController.value.text = (text.value);
+      String tempMemo = unConnectedFridgeDocumentSnapshot.get('memo');
+      memo = tempMemo.obs;
 
+      print(tempMeat);
+      print(memo);
+      textController.value.text = memo.value;
+
+
+    }
   }
 
-  Future<void> toggleFood(RxBool hasFood, String food) async {
-    final SharedPreferences pref = await _prefs;
+    Future<void> toggleFood(RxBool hasFood, String food) async { // 값이 바뀌는게 바로바로 적용이 안된다. 아무래도 함수를 여러개 정의해야 할것 같다.
+      String documentName = connectedId;
+      if (connectedId == ' ') {
+        documentName =
+            AuthController.controller.authentication.currentUser!.uid;
+      }
 
-    if (!hasFood.value){ // hasMeat과 sharedPreferences를 둘다 바꿔줘야함
-      hasFood = false.obs;
-      pref.setBool('$food - $uid', false);
-    }else{
-      hasFood = true.obs;
-      pref.setBool('$food - $uid', true);
+      print(documentName);
+
+
+      if (hasFood.value) {
+        hasFood.value = false;
+        await FirestoreController.controller.firestore.collection('user').doc(
+            documentName).collection('fridge').doc('default_fridge').update({
+          food : false
+        });
+      } else {
+        hasFood.value = true;
+        await FirestoreController.controller.firestore.collection('user').doc(
+            documentName).collection('fridge').doc('default_fridge').update({
+          food: true
+        });
+      }
     }
 
-    // print(hasMeat.value);
-
-}
 
 
-  Future<void> saveSharedText(String text) async{
-    final SharedPreferences pref = await _prefs;
 
-    pref.setString('text - $uid', text);
+
+    Future<void> saveSharedText(String text) async {
+      String documentName = connectedId;
+      if (connectedId == ' ') {
+        documentName =
+            AuthController.controller.authentication.currentUser!.uid;
+      }
+
+      await FirestoreController.controller.firestore.collection('user').doc(
+          documentName).collection('fridge').doc('default_fridge').update({
+        'memo': text
+      });
+    }
+
+    Future<void> clearSharedText() async {
+      String documentName = connectedId;
+      if (connectedId == ' ') {
+        documentName =
+            AuthController.controller.authentication.currentUser!.uid;
+      }
+
+      await FirestoreController.controller.firestore.collection('user').doc(
+          documentName).collection('fridge').doc('default_fridge').update({
+        'memo': ' '
+      });
+    }
   }
 
-  Future<void> clearSharedText() async{
-    final SharedPreferences pref = await _prefs;
-
-    pref.setString('text - $uid', '');
-  }
-
-
-
-
-
-}
 
 // I/flutter ( 5698): 2023-07-10 15:00:00.000Z
 // I/flutter ( 5698): 2023-07-11 15:00:00.000Z

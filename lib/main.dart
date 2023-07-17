@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+import 'controller/deprecated_fridge_controller.dart';
 import 'controller/fridge_controller.dart';
 
 void main() async{

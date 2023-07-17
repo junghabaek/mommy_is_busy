@@ -2,11 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mommy_is_busy/controller/firestore_controller.dart';
-import 'package:mommy_is_busy/controller/fridge_controller.dart';
+import 'package:mommy_is_busy/controller/deprecated_fridge_controller.dart';
 import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 
 import '../screens/login_signup/login.dart';
+import 'fridge_controller.dart';
 
 class AuthController extends GetxController{
   static AuthController controller = Get.find();
@@ -28,7 +29,6 @@ class AuthController extends GetxController{
     if (user == null){
       Get.offAll(()=>LogInPage());
     }else{
-      FridgeController.controller.initFridge();
       Get.offAll(()=>Home());
 
     }
@@ -43,7 +43,47 @@ class AuthController extends GetxController{
     await FirestoreController.controller.firestore.collection('user').doc(authentication.currentUser!.uid).set({
       'nickname' : nickname,
       'email_address' : email,
+      'sharing_code' : 0,
+      'connected_id' : ' ',
     });
+
+    await FirestoreController.controller.firestore.collection('user').doc(authentication.currentUser!.uid).collection('fridge').doc('default_fridge').set({
+      'hasMeat' : false,
+      'hasVeggies' : false,
+      'hasFruits' : false,
+      'hasSauce' : false,
+      'hasSnacks' : false,
+      'hasDrinks' : false,
+      'memo' : ' ',
+    });
+  }
+
+  void updateSharingCode(int sharingCode) async {
+    await FirestoreController.controller.firestore.collection('user').doc(authentication.currentUser!.uid).update({
+      'sharing_code' : sharingCode,
+    });
+
+
+
+  }
+
+  Future<bool> connectWithSharingCode(int sharingCode) async{
+    // String documentName;
+    var querySnapshot = await FirestoreController.controller.firestore.collection('user').where('sharing_code', isEqualTo: sharingCode).get();
+    if (querySnapshot.size==0){
+      return false;
+    }else {
+
+
+      String docId = querySnapshot.docs[0].id;
+
+      print(docId);
+      print(authentication.currentUser!.uid);
+      await FirestoreController.controller.firestore.collection('user').doc(authentication.currentUser!.uid).update({'connected_id': docId,});
+
+      return true;
+    }
+    // then((querySnapshot){querySnapshot.docs.forEach((var doc){print(doc.id);});});
   }
 
   void signOut() async {

@@ -39,12 +39,6 @@ class Calendar_Fixed extends StatelessWidget {
     // DateTime selectedDay = calendarController.focusedDay.value;
     selectedEvents = ValueNotifier(getEventsForDay(calendarController.selectedDay.value!));
 
-
-
-
-
-
-
     List<Widget> newTasks = [TextFormField(
       key: UniqueKey(),
       onSaved:(val){

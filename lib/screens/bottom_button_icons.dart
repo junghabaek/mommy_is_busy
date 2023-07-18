@@ -32,9 +32,9 @@ class BottomButtonIconRow extends StatelessWidget {
             if(pageFrom!='Calendar')
             Get.offAll(()=>Calendar_Fixed());
           }, icon: Icon(Icons.calendar_month)),
-          IconButton(onPressed: () {
+          IconButton(onPressed: () async {
             if(pageFrom!='Fridge') {
-              FridgeController.controller.loadFridge();
+              await FridgeController.controller.loadFridge();
               Get.offAll(() => Fridge());
             }
           }, icon: Icon(Icons.food_bank)),

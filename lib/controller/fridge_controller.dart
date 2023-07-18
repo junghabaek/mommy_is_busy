@@ -9,9 +9,9 @@ class FridgeController extends GetxController{
   static FridgeController controller = Get.find();
 
 
-  String connectedId = ' ';
+  RxString connectedId = ' '.obs;
 
-  late RxBool hasMeat;
+  RxBool hasMeat = false.obs;
   RxBool hasVeggies = false.obs;
   RxBool hasFruits = false.obs;
   RxBool hasSauce = false.obs;
@@ -21,50 +21,64 @@ class FridgeController extends GetxController{
   RxString memo = 'memo'.obs;
 
   Future<void> loadFridge() async {
-    hasMeat = false.obs;
+
 
     DocumentSnapshot snapshot = await FirestoreController.controller.firestore
         .collection('user').doc(
         AuthController.controller.authentication.currentUser!.uid).get();
 
-    connectedId = snapshot.get('connected_id');
+    connectedId.value = snapshot.get('connected_id');
+    print('connectedId.value from loadFridge is called');
+    print(connectedId.value);
 
-    if (connectedId == ' ') { //if no other account is connected
-      DocumentSnapshot unConnectedFridgeDocumentSnapshot = await FirestoreController
+
+
+    DocumentSnapshot FridgeDocumentSnapshot;
+
+    if (connectedId==' ') { // 연결된 계정이 없다면, 자기 자신의 계정의 냉장고를 본다.
+      FridgeDocumentSnapshot = await FirestoreController
           .controller.firestore.collection('user').doc(
-          AuthController.controller.authentication.currentUser!.uid).collection('fridge').doc('default_fridge').get();
+          AuthController.controller.authentication.currentUser!.uid).collection(
+          'fridge').doc('default_fridge').get();
+    } else{ // 연결된 계정이 있다면, 연결된 계정의 냉장고를 본다.
+      FridgeDocumentSnapshot = await FirestoreController
+          .controller.firestore.collection('user').doc(connectedId.value).collection(
+          'fridge').doc('default_fridge').get();
+    }
+    // if (connectedId == ' ') { //if no other account is connected
+    //   DocumentSnapshot unConnectedFridgeDocumentSnapshot = await FirestoreController
+    //       .controller.firestore.collection('user').doc(
+    //       AuthController.controller.authentication.currentUser!.uid).collection('fridge').doc('default_fridge').get();
+    //
+    //   bool tempMeat = unConnectedFridgeDocumentSnapshot.get('hasMeat');
+    //   hasMeat.value = tempMeat;
+    //
+    //   bool tempVeggies = unConnectedFridgeDocumentSnapshot.get('hasVeggies');
+    //   hasVeggies.value = tempVeggies;
+    //
+    //   bool tempFruits = unConnectedFridgeDocumentSnapshot.get('hasFruits');
+    //   hasFruits.value = tempFruits;
+    //
+    //   bool tempSauce = unConnectedFridgeDocumentSnapshot.get('hasSauce');
+    //   hasSauce.value = tempSauce;
+    //
+    //   bool tempSnacks = unConnectedFridgeDocumentSnapshot.get('hasSnacks');
+    //   hasSnacks.value = tempSnacks;
+    //
+    //   bool tempDrinks = unConnectedFridgeDocumentSnapshot.get('hasDrinks');
+    //   hasDrinks.value = tempDrinks;
 
-      bool tempMeat = unConnectedFridgeDocumentSnapshot.get('hasMeat');
-      hasMeat.value = tempMeat;
+      String tempMemo = FridgeDocumentSnapshot.get('memo');
+      memo.value = tempMemo;
 
-      bool tempVeggies = unConnectedFridgeDocumentSnapshot.get('hasVeggies');
-      hasVeggies.value = tempVeggies;
-
-      bool tempFruits = unConnectedFridgeDocumentSnapshot.get('hasFruits');
-      hasFruits.value = tempFruits;
-
-      bool tempSauce = unConnectedFridgeDocumentSnapshot.get('hasSauce');
-      hasSauce.value = tempSauce;
-
-      bool tempSnacks = unConnectedFridgeDocumentSnapshot.get('hasSnacks');
-      hasSnacks.value = tempSnacks;
-
-      bool tempDrinks = unConnectedFridgeDocumentSnapshot.get('hasDrinks');
-      hasDrinks.value = tempDrinks;
-
-      String tempMemo = unConnectedFridgeDocumentSnapshot.get('memo');
-      memo = tempMemo.obs;
-
-      print(tempMeat);
       print(memo);
       textController.value.text = memo.value;
 
 
-    }
   }
 
     Future<void> toggleFood(RxBool hasFood, String food) async { // 값이 바뀌는게 바로바로 적용이 안된다. 아무래도 함수를 여러개 정의해야 할것 같다.
-      String documentName = connectedId;
+      String documentName = connectedId.value;
       if (connectedId == ' ') {
         documentName =
             AuthController.controller.authentication.currentUser!.uid;
@@ -93,7 +107,7 @@ class FridgeController extends GetxController{
 
 
     Future<void> saveSharedText(String text) async {
-      String documentName = connectedId;
+      String documentName = connectedId.value;
       if (connectedId == ' ') {
         documentName =
             AuthController.controller.authentication.currentUser!.uid;
@@ -106,7 +120,7 @@ class FridgeController extends GetxController{
     }
 
     Future<void> clearSharedText() async {
-      String documentName = connectedId;
+      String documentName = connectedId.value;
       if (connectedId == ' ') {
         documentName =
             AuthController.controller.authentication.currentUser!.uid;
@@ -116,6 +130,18 @@ class FridgeController extends GetxController{
           documentName).collection('fridge').doc('default_fridge').update({
         'memo': ' '
       });
+    }
+
+    Stream<DocumentSnapshot> getDocumentSnapshot() {
+      String documentName = connectedId.value;
+      if (connectedId.value == ' ') {
+        documentName =
+            AuthController.controller.authentication.currentUser!.uid;
+      }
+      print('connectedId $connectedId');
+      print('documentName');
+      print(documentName);
+      return FirestoreController.controller.firestore.collection('user/$documentName/fridge').doc('default_fridge').snapshots();
     }
   }
 

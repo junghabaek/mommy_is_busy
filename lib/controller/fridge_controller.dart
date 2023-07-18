@@ -35,7 +35,7 @@ class FridgeController extends GetxController{
 
     DocumentSnapshot FridgeDocumentSnapshot;
 
-    if (connectedId==' ') { // 연결된 계정이 없다면, 자기 자신의 계정의 냉장고를 본다.
+    if (connectedId.value==' ') { // 연결된 계정이 없다면, 자기 자신의 계정의 냉장고를 본다.
       FridgeDocumentSnapshot = await FirestoreController
           .controller.firestore.collection('user').doc(
           AuthController.controller.authentication.currentUser!.uid).collection(
@@ -72,14 +72,31 @@ class FridgeController extends GetxController{
       memo.value = tempMemo;
 
       print(memo);
-      textController.value.text = memo.value;
+      // textController.value.text = memo.value;
+
+      Stream<DocumentSnapshot> documentSnapshot = getDocumentSnapshot();
+
+      documentSnapshot.listen((event) {
+        // textController.value.text = event.data()!['memo'];
+        final data = event.data();
+        if (data != null && data is Map<String, dynamic>) {
+          textController.value.value = TextEditingValue(
+            text: data['memo'],
+            selection: TextSelection.fromPosition(
+              TextPosition(offset: data['memo'].length),
+            )
+          );
+          // textController.value.text = data['memo'];
+
+        }
+      });
 
 
   }
 
     Future<void> toggleFood(RxBool hasFood, String food) async { // 값이 바뀌는게 바로바로 적용이 안된다. 아무래도 함수를 여러개 정의해야 할것 같다.
       String documentName = connectedId.value;
-      if (connectedId == ' ') {
+      if (connectedId.value == ' ') {
         documentName =
             AuthController.controller.authentication.currentUser!.uid;
       }
@@ -108,7 +125,7 @@ class FridgeController extends GetxController{
 
     Future<void> saveSharedText(String text) async {
       String documentName = connectedId.value;
-      if (connectedId == ' ') {
+      if (connectedId.value == ' ') {
         documentName =
             AuthController.controller.authentication.currentUser!.uid;
       }
@@ -121,7 +138,7 @@ class FridgeController extends GetxController{
 
     Future<void> clearSharedText() async {
       String documentName = connectedId.value;
-      if (connectedId == ' ') {
+      if (connectedId.value == ' ') {
         documentName =
             AuthController.controller.authentication.currentUser!.uid;
       }

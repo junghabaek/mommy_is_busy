@@ -171,7 +171,7 @@ class Fridge extends StatelessWidget {
                           margin: EdgeInsets.fromLTRB(15, 0, 15, 5),
                           height: MediaQuery.of(context).size.height*.2,
                           child:
-                          TextFormField(
+                          Obx( ()=>TextFormField(
                             // snapshot.data!.get('hasMeat')
                             minLines: 1,
                             maxLines: 30,
@@ -181,14 +181,18 @@ class Fridge extends StatelessWidget {
                             // suffixIcon: FridgeController.controller.textController.value.text.isEmpty?
                             // null : IconButton(onPressed: (){FridgeController.controller.textController.value.clear();},
                             //     icon: Icon(Icons.clear, color: Colors.black,))),
-                            controller: controller,
+                            controller: FridgeController.controller.textController.value,
+                            // initialValue: snapshot.data!.get('memo'),
                             onChanged: (text){
-                              controller.text = snapshot.data!.get('memo');
+                              // controller.text = snapshot.data!.get('memo');
                               FridgeController.controller.saveSharedText(text);
+                              // FridgeController.controller.textController.value.text = text;
+
                             },
                             onSaved: (text){},
                           ),
 
+                      )
                       )
                       ),
                     ),

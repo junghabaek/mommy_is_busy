@@ -7,6 +7,7 @@ import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/main_page.dart';
 
 import '../screens/login_signup/login.dart';
+import 'calendar_controller.dart';
 import 'fridge_controller.dart';
 
 class AuthController extends GetxController{
@@ -25,12 +26,14 @@ class AuthController extends GetxController{
     ever(_user, _moveToPage);
   }
 
-  _moveToPage(User? user){
+  _moveToPage(User? user) async {
     if (user == null){
       Get.offAll(()=>LogInPage());
     }else{
+      FirestoreController.controller.eventList.clear();
+      FirestoreController.controller.eventMap.clear();
+      await FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
       Get.offAll(()=>Home());
-
     }
   }
 

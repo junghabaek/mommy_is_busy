@@ -7,6 +7,8 @@ import 'package:mommy_is_busy/screens/deprecated_fridge_state_using_shared_prefe
 import 'package:mommy_is_busy/screens/home.dart';
 import 'package:mommy_is_busy/screens/settings.dart';
 
+import '../controller/calendar_controller.dart';
+import '../controller/firestore_controller.dart';
 import '../controller/fridge_controller.dart';
 import 'fridge_state.dart';
 import 'household_account.dart';
@@ -24,9 +26,13 @@ class BottomButtonIconRow extends StatelessWidget {
       children: [Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(onPressed: () {
-            if(pageFrom!='Home')
-            Get.offAll(()=>Home());
+          IconButton(onPressed: () async{
+            if(pageFrom!='Home') {
+              FirestoreController.controller.eventList.clear();
+              FirestoreController.controller.eventMap.clear();
+              await FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
+              Get.offAll(() => Home());
+            }
           }, icon: Icon(Icons.home)),
           IconButton(onPressed: (){
             if(pageFrom!='Calendar')

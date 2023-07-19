@@ -75,27 +75,27 @@ class FirestoreController extends GetxController{
       print(deadline);
       print('deadline');
 
-      if(eventMap.containsKey(deadline)){
-        eventMap[deadline]!.add(event);
+      if(eventMap.value.containsKey(deadline)){
+        eventMap.value[deadline]!.add(event);
       }else{
-        eventMap[deadline] = <Event>[];
-        eventMap[deadline]!.add(event);
+        eventMap.value[deadline] = <Event>[];
+        eventMap.value[deadline]!.add(event);
       }
     });
     });
 
     //중복 제거하기
-    eventMap.forEach((key, value) {
-      eventMap[key] = eventMap[key]!.toSet().toList();
+    eventMap.value.forEach((key, value) {
+      eventMap.value[key] = eventMap.value[key]!.toSet().toList();
     });
 
-    eventMap.forEach((key, value) {
+    eventMap.value.forEach((key, value) {
       value.forEach((element) {print('============$key : ${element.eventName}');});
     });
 
 
-    var temp = eventMap.keys.toList()..sort();
-    keyList = temp.obs;
+    var temp = eventMap.value.keys.toList()..sort();
+    keyList.value = temp;
 
     print('123123123123123');
     print(keyList);

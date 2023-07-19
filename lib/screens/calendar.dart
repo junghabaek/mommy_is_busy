@@ -4,7 +4,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:mommy_is_busy/screens/bottom_button_icons.dart';
 //
-// import '../bottom_buttons.dart';
+// import '../deprecated_bottom_buttons.dart';
 // import 'package:table_calendar/table_calendar.dart';
 //
 // import '../models/calendar_event.dart';

@@ -16,6 +16,8 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
     // CalendarController.controller CalendarController.controller = Get.put(CalendarController.controller());
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -61,17 +63,12 @@ class Home extends StatelessWidget {
     }
 
 
-
-    FirestoreController.controller.eventList.clear();
-    FirestoreController.controller.eventMap.clear();
-
-    FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
+    // FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
     print('selectedDayFromHome :${CalendarController.controller.selectedDayFromHome.value}');
     List<DateTime> keyList = FirestoreController.controller.eventMap.value.keys.toList()..sort();
 
-
     final eventMap = FirestoreController.controller.eventMap.value;
-    // final keyList = FirestoreController.controller.keyList.value;
+    print(eventMap.keys);
     print('keylist');
     // print(DateTime.now().toString());
     print(keyList);
@@ -118,7 +115,7 @@ class Home extends StatelessWidget {
         Padding(padding: EdgeInsets.only(bottom: 100),
             child: FloatingActionButton(
               onPressed: (){
-              showDialog(context: context, builder: (context){
+              showDialog(context: context, builder: (ctx){
             return
                  AlertDialog(title: Text('날짜를 지정해 주세요'),
                 actions: [],
@@ -142,18 +139,18 @@ class Home extends StatelessWidget {
                     // the time-part of compared DateTime objects.
                     return isSameDay(CalendarController.controller.selectedDayFromHome.value, day);
                   },
-                  onDaySelected: (selectedDay, focusedDay) {
+                  onDaySelected: (selectedDay, focusedDay) async {
                       CalendarController.controller.selectedDayFromHome.value = TC.subtractNineHours(selectedDay.toLocal());
                       CalendarController.controller.focusedDayFromHome.value = focusedDay;
                       FirestoreController.controller.eventList.clear();
                       FirestoreController.controller.eventMap.clear();
-                      FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
+                      await FirestoreController.controller.getEvents(CalendarController.controller.selectedDayFromHome.value);
 
 
                       print(focusedDay);
                       print('selectedDay');
                       print(selectedDay);
-                      Navigator.of(context).pop();
+                      Get.offAll(()=> Home());
 
                   },
                   onFormatChanged: (format) {
@@ -275,47 +272,22 @@ class Home extends StatelessWidget {
                         child: Container(
                           width: width,
                           color: Colors.yellow,
-                          child: Obx( (){
-                            final eventMap = FirestoreController.controller.eventMap;
-                            final keyList = FirestoreController.controller.keyList;
-
-                            if (allTaskDone(eventMap))
-                              return Icon(Icons.coffee, size: 100,);
-
-                            return ListView.builder(
+                          child:
+                             (allTaskDone(eventMap))?
+                               Icon(Icons.coffee, size: 100,) :
+                             ListView.builder(
                                 itemCount: eventMap.length,
                                 padding: EdgeInsets.all(8),
                                 itemBuilder: (context, idx) {
                                   DateTime mapKey = keyList[idx];
-
+                                  print('*********************');
+                                  print(mapKey);
                                   if (!isEveryTaskDone(eventMap[mapKey]!)){
-                                    return buildContainer(mapKey);
-                                    GestureDetector(
-                                      key: UniqueKey(),
-                                      onTap: (){
-                                        Get.offAll(()=>TaskListScreen(mapKey: mapKey,));
-                                      },
-                                      child: Container(
-                                          color: Colors.grey,
-                                          margin: EdgeInsets.all(8),
-                                          child: Column(
-                                              children:[
-                                                Text(mapKey.toString())
-                                              ])
-                                      ),
-                                    );}
+                                    return buildContainer(mapKey);}
                                   return buildCompletedContainer(mapKey);
-                                  Container(
-                                      color: Colors.grey,
-                                      margin: EdgeInsets.all(8),
-                                      child: Column(
-                                          children:[
-                                            Text(mapKey.toString(), style: TextStyle( decoration: TextDecoration.lineThrough))
-                                          ])
-                                  );
 
-                                });
-                          }),),
+                          },),
+                      ),
                       ),
 
                     //   Expanded(

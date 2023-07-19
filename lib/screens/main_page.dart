@@ -1,6 +1,6 @@
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
-// import 'package:mommy_is_busy/bottom_buttons.dart';
+// import 'package:mommy_is_busy/deprecated_bottom_buttons.dart';
 // import 'package:mommy_is_busy/screens/bottom_button_icons.dart';
 // import 'package:timer_builder/timer_builder.dart';
 //
